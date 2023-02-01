@@ -22,3 +22,10 @@ fn typoscale() {
 fn iter() {
     assert_eq!(iter::TypoScaleIterator::default().take(64).map(|f|f as usize).collect::<Vec<_>>().as_slice(), RESULTS2.into_iter().map(|f|*f as usize).collect::<Vec<_>>().as_slice());
 }
+
+#[test]
+fn iter_lcg() {
+    let i = iter::TypoScaleLcgIterator::default();
+    let n = i.take(24).collect::<Vec<_>>();
+    assert_eq!(n, [1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 14, 16, 18, 21, 24, 30, 36, 48, 60, 72, 84, 96, 128]);
+}

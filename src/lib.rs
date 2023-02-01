@@ -23,31 +23,26 @@ use num_traits::{ToPrimitive, int::PrimInt};
 const FIFTHS: [&str; 5] = ["", "⅕", "⅖", "⅗", "⅘"];
 const NARROW: &str = " ";
 
-/// 1, 1 1⁄10, 1 3⁄10, 1 ½, 1 7⁄10, 2, 2 ⅕, 2 ⅗, 3, 3 ⅖, 4, 4 ½, 5 ⅕, 6, 6 9⁄10, 8, 9 1⁄10, 10 ½, 12 1⁄10, 13 9⁄10, 16, 18 3⁄10, 21 1⁄10, 24 ⅕, 27 ⅘, 32, 36 7⁄10, 42 ⅕, 48 ½, 55 7⁄10, 64, 73 ½, 84 ⅖, 97, 111 ⅖, 128, 147, 168 ⅘, 194, 222 ⅘, 256, 294, 337 7⁄10, 388, 445 7⁄10, 512, 588 1⁄10, 675 ½, 776, 891 ⅖, 1024, 1176 ⅕, 1351 1⁄10, 1552, 1782 ⅘, 2048, 2352 ½, 2702 3⁄10, 3104 1⁄10, 3565 7⁄10, 4096, 4705, 5404 7⁄10, 6208 3⁄10…
-pub trait TypoScale<T> {
-    fn typoscale(self) -> f64;
-    fn int_typoscale(&self) -> usize;
-    fn fraction_str(&self) -> String;
-}
-
-impl<T> TypoScale<T> for T
-where
-    T: ToPrimitive + PrimInt + std::fmt::Display,
-{
-    fn typoscale(self) -> f64 {
-        let i = self.to_f64().unwrap();
-        
-        1.0 * (2.0f64.powf(i / 5.0))
-    }
-
+/// By default, on the standard types like `usize`, this yields 1, 1 1⁄10, 1 3⁄10, 1 ½, 1 7⁄10, 2, 2 ⅕, 2 ⅗, 3, 3 ⅖, 4, 4 ½, 5 ⅕, 6, 6 9⁄10, 8, 9 1⁄10, 10 ½, 12 1⁄10, 13 9⁄10, 16, 18 3⁄10, 21 1⁄10, 24 ⅕, 27 ⅘, 32, 36 7⁄10, 42 ⅕, 48 ½, 55 7⁄10, 64, 73 ½, 84 ⅖, 97, 111 ⅖, 128, 147, 168 ⅘, 194, 222 ⅘, 256, 294, 337 7⁄10, 388, 445 7⁄10, 512, 588 1⁄10, 675 ½, 776, 891 ⅖, 1024, 1176 ⅕, 1351 1⁄10, 1552, 1782 ⅘, 2048, 2352 ½, 2702 3⁄10, 3104 1⁄10, 3565 7⁄10, 4096, 4705, 5404 7⁄10, 6208 3⁄10…
+///
+/// If you want the traditional European typographic scale, you want [`iter::TypoScaleLcgIterator`].
+pub trait TypoScale<T> where T: Default {
+    /// converts a positive integer index to its equivalent value on the typographic scale.
+    fn typoscale(&self) -> f64;
+    /// converts a positive integer index to its equivalent value on the typographic scale.
+    /// (rounded to nearest)
     fn int_typoscale(&self) -> usize {
-        let i = self.to_f64().unwrap();
-        (1.0f64 * (2.0f64.powf(i / 5.0))).floor() as usize
+        self.typoscale().round() as usize
     }
-
+    /// converts a positive integer index to its equivalent value on the typographic scale.
+    /// (floored)
+    fn int_typoscale_floor(&self) -> usize {
+        self.typoscale().floor() as usize
+    }
+    /// returns a string representation of the whole and fractional components of the typographic scale value for a positive integer
     // for 2 yields 1 3⁄10
     fn fraction_str(&self) -> String {
-        let i = self.to_f64().unwrap();
+        let i = self.typoscale();
         let int_typoscale = (1.0f64 * (2.0f64.powf(i / 5.0))).floor() as usize;
         let typoscale = 1.0f64 * (2.0f64.powf(i / 5.0));
         if typoscale.fract() < std::f64::EPSILON {
@@ -72,6 +67,17 @@ where
         }
 
         s
+    }
+}
+
+impl<T> TypoScale<T> for T
+where
+    T: ToPrimitive + PrimInt + std::fmt::Display + Default,
+{
+    fn typoscale(&self) -> f64 {
+        let i = self.to_f64().unwrap();
+        
+        1.0 * (2.0f64.powf(i / 5.0))
     }
 }
 
