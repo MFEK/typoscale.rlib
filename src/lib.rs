@@ -42,9 +42,8 @@ pub trait TypoScale<T> where T: Default {
     /// returns a string representation of the whole and fractional components of the typographic scale value for a positive integer
     // for 2 yields 1 3⁄10
     fn fraction_str(&self) -> String {
-        let i = self.typoscale();
-        let int_typoscale = (1.0f64 * (2.0f64.powf(i / 5.0))).floor() as usize;
-        let typoscale = 1.0f64 * (2.0f64.powf(i / 5.0));
+        let typoscale = self.typoscale();
+        let int_typoscale = self.int_typoscale_floor() as usize;
         if typoscale.fract() < std::f64::EPSILON {
             return int_typoscale.to_string();
         }
