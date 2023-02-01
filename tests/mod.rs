@@ -20,5 +20,5 @@ fn typoscale() {
 
 #[test]
 fn iter() {
-    assert_eq!(iter::TyposcaleIterator::new(0, 63, 1).into_iter().collect::<Vec<_>>().as_slice(), RESULTS2.into_iter().map(|f|*f as usize).collect::<Vec<_>>().as_slice());
+    assert_eq!(iter::TypoScaleIterator::default().take(64).map(|f|f as usize).collect::<Vec<_>>().as_slice(), RESULTS2.into_iter().map(|f|*f as usize).collect::<Vec<_>>().as_slice());
 }
